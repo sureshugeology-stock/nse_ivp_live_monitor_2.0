@@ -1,0 +1,7 @@
+flask
+pandas
+matplotlib
+selenium
+jinja2
+python-telegram-bot
+requests
