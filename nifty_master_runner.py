@@ -345,7 +345,6 @@ def generate_ivp_plots():
         df = df.dropna(subset=['timestamp'])
         df = df.sort_values("timestamp")
 
-        # Fill forward india_vix
         if 'india_vix' not in df.columns:
             df['india_vix'] = None
         df['india_vix'] = df['india_vix'].ffill()
@@ -374,24 +373,29 @@ def generate_ivp_plots():
             # Subplot 1: VIX + IV
             ax1 = axes[0]
             ax1.plot(df_sym['timestamp'], df_sym['india_vix'], label='India VIX', color='red', linestyle='--', linewidth=2)
-            if f'{prefix}_curr_straddle_iv' in df_sym.columns:
+            ax1.set_ylabel("India VIX", color='red')
+            ax1.set_title(f"VIX & IV vs Time ({title_prefix})")
+
+            if f'{prefix}_curr_straddle_iv' in df_sym.columns and f'{prefix}_next_straddle_iv' in df_sym.columns:
                 ax1b = ax1.twinx()
                 ax1b.plot(df_sym['timestamp'], df_sym[f'{prefix}_curr_straddle_iv'], label='Curr IV', color='blue', linewidth=2)
                 ax1b.plot(df_sym['timestamp'], df_sym[f'{prefix}_next_straddle_iv'], label='Next IV', color='orange', linewidth=2)
                 ax1b.set_ylabel("Straddle IV", color='blue')
                 ax1b.legend(loc='lower right')
-            ax1.set_ylabel("India VIX", color='red')
-            ax1.set_title(f"VIX & IV vs Time ({title_prefix})")
             ax1.legend(loc='lower left')
 
             # Subplot 2: Spot vs Premium + VWAP
             ax2 = axes[1]
-            ax2.plot(df_sym['timestamp'], df_sym[f'{prefix}_curr_spot'], label='Spot', color='black', linewidth=2)
+            ax2.plot(df_sym['timestamp'], df_sym.get(f'{prefix}_curr_spot', []), label='Spot', color='black', linewidth=2)
             ax2b = ax2.twinx()
-            ax2b.plot(df_sym['timestamp'], df_sym[f'{prefix}_curr_straddle'], label='Curr Premium', color='blue', linewidth=2)
-            ax2b.plot(df_sym['timestamp'], df_sym[f'{prefix}_curr_VWAP'], label='Curr VWAP', color='blue', linestyle='--', linewidth=2)
-            ax2b.plot(df_sym['timestamp'], df_sym[f'{prefix}_next_straddle'], label='Next Premium', color='orange', linewidth=2)
-            ax2b.plot(df_sym['timestamp'], df_sym[f'{prefix}_next_VWAP'], label='Next VWAP', color='orange', linestyle='--', linewidth=2)
+            if f'{prefix}_curr_straddle' in df_sym.columns:
+                ax2b.plot(df_sym['timestamp'], df_sym[f'{prefix}_curr_straddle'], label='Curr Premium', color='blue', linewidth=2)
+            if f'{prefix}_curr_VWAP' in df_sym.columns:
+                ax2b.plot(df_sym['timestamp'], df_sym[f'{prefix}_curr_VWAP'], label='Curr VWAP', color='blue', linestyle='--', linewidth=2)
+            if f'{prefix}_next_straddle' in df_sym.columns:
+                ax2b.plot(df_sym['timestamp'], df_sym[f'{prefix}_next_straddle'], label='Next Premium', color='orange', linewidth=2)
+            if f'{prefix}_next_VWAP' in df_sym.columns:
+                ax2b.plot(df_sym['timestamp'], df_sym[f'{prefix}_next_VWAP'], label='Next VWAP', color='orange', linestyle='--', linewidth=2)
             ax2.set_ylabel("Spot")
             ax2b.set_ylabel("Straddle / VWAP")
             ax2.set_title(f"Spot vs Straddle Premium & VWAP ({title_prefix})")
@@ -399,20 +403,25 @@ def generate_ivp_plots():
             ax2b.legend(loc='lower right')
 
             # Subplot 3: Spot vs IVP%
-            ax3 = axes[2]
-            ax3.plot(df_sym['timestamp'], df_sym[f'{prefix}_curr_spot'], label='Spot Price', color='black', linewidth=2)
-            ax3b = ax3.twinx()
-            ax3b.plot(df_sym['timestamp'], df_sym[f'{prefix}_curr_ivp'], label='Curr IVP%', color='green', linewidth=2)
-            ax3b.plot(df_sym['timestamp'], df_sym[f'{prefix}_next_ivp'], label='Next IVP%', color='darkorange', linewidth=2)
-            ax3.set_ylabel('Spot Price', color='black')
-            ax3b.set_ylabel('IVP %', color='green')
-            ax3.set_title(f"Spot vs IVP% ({title_prefix})")
-            ax3.legend(loc='lower left')
-            ax3b.legend(loc='lower right')
+            ivp_curr_col = f'{prefix}_curr_ivp'
+            ivp_next_col = f'{prefix}_next_ivp'
+            if ivp_curr_col in df_sym.columns and ivp_next_col in df_sym.columns:
+                ax3 = axes[2]
+                ax3.plot(df_sym['timestamp'], df_sym[f'{prefix}_curr_spot'], label='Spot Price', color='black', linewidth=2)
+                ax3b = ax3.twinx()
+                ax3b.plot(df_sym['timestamp'], df_sym[ivp_curr_col], label='Curr IVP%', color='green', linewidth=2)
+                ax3b.plot(df_sym['timestamp'], df_sym[ivp_next_col], label='Next IVP%', color='darkorange', linewidth=2)
+                ax3.set_ylabel('Spot Price', color='black')
+                ax3b.set_ylabel('IVP %', color='green')
+                ax3.set_title(f"Spot vs IVP% ({title_prefix})")
+                ax3.legend(loc='lower left')
+                ax3b.legend(loc='lower right')
+                format_axes(ax3)
+            else:
+                print(f"⚠️ Skipping IVP% subplot for {prefix}: IVP columns not found")
 
-            # Format all
-            for ax in axes:
-                format_axes(ax)
+            format_axes(ax1)
+            format_axes(ax2)
 
             plt.tight_layout()
             if SAVE_PDF:
