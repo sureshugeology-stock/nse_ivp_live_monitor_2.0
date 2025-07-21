@@ -5,3 +5,6 @@ selenium
 jinja2
 python-telegram-bot
 requests
+beautifulsoup4
+pytz
+webdriver-manager
