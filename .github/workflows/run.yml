@@ -34,7 +34,6 @@ jobs:
       run: |
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-        git pull --rebase
         git add static || true
         git add reports || true
         git commit -m "Auto-update plots and CSVs" || echo "Nothing to commit"
