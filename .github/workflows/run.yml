@@ -1,38 +1,36 @@
-name: Run NSE IVP Monitor
+name: Run NSE IVP Monitor Every 5 Min During Market Hours
 
 on:
   schedule:
-    - cron: '*/5 * * * *'  # Runs every 5 minutes
-  workflow_dispatch:       # Allows manual trigger from GitHub UI
+    - cron: '*/5 3-9 * * 1-5'  # Every 5 min from 8:30 AM to 3:29 PM IST (converted to UTC)
+  workflow_dispatch:  # Allows manual trigger from GitHub UI
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v3
+    - name: Checkout Repository
+      uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
 
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
 
-      - name: Run IVP master script (with time filter)
-        run: |
-          python nifty_master_runner.py
+    - name: Run NSE Master Script
+      run: |
+        python nifty_master_runner.py
 
-      - name: Push updated files to GitHub Pages
-        run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git pull --rebase
-          git add static/*.png static/*.csv
-          git commit -m "Auto-update IVP plots and CSV"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Commit & Push Updated Files
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        git add static/*.png static/*.csv static/*.pdf
+        git commit -m "Auto-update plots and CSVs" || echo "Nothing to commit"
+        git push origin main
