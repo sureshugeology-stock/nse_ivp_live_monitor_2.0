@@ -34,8 +34,8 @@ PDF_PATH = os.path.join(PDF_FOLDER, f"{TODAY}.pdf")
 PNG_NIFTY_PATH = os.path.join(STATIC_DIR, "nifty_ivp_live_plot.png")
 PNG_BANKNIFTY_PATH = os.path.join(STATIC_DIR, "banknifty_ivp_live_plot.png")
 
-TELEGRAM_TOKEN = os.getenv("7825377300:AAEsG7i32vbSc3VLuJNFHnDkyjLi52QpV_E")
-TELEGRAM_CHAT_ID = os.getenv("5753776804")
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
 print(f"TELEGRAM_TOKEN={bool(TELEGRAM_TOKEN)}, CHAT_ID={bool(TELEGRAM_CHAT_ID)}")
 
