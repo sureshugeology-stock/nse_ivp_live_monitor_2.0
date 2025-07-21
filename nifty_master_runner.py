@@ -37,6 +37,8 @@ PNG_BANKNIFTY_PATH = os.path.join(STATIC_DIR, "banknifty_ivp_live_plot.png")
 TELEGRAM_TOKEN = os.getenv("7825377300:AAEsG7i32vbSc3VLuJNFHnDkyjLi52QpV_E")
 TELEGRAM_CHAT_ID = os.getenv("5753776804")
 
+print(f"TELEGRAM_TOKEN={bool(TELEGRAM_TOKEN)}, CHAT_ID={bool(TELEGRAM_CHAT_ID)}")
+
 LOOKBACK = 30
 SLEEP_INTERVAL = 300  # 5 minutes
 VIX_HIGH = 16
