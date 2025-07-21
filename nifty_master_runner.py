@@ -323,94 +323,98 @@ def prepare_combined_row(timestamp, india_vix, nifty_data, banknifty_data):
                     ))
 
     return combined_row
-
 # -----------------------------------------
 # ✅ GENERATE IVP PLOTS (PNG + PDF)
 # -----------------------------------------
 def generate_ivp_plots():
-    timestamp_now = datetime.now(timezone('Asia/Kolkata')).strftime("%Y-%m-%d %H:%M:%S")
-    print(f"\U0001f5bc️ Generating plots at {timestamp_now}")
+    import matplotlib.pyplot as plt
+    import matplotlib.dates as mdates
+    from matplotlib.backends.backend_pdf import PdfPages
 
-    df = load_existing_csv()
-    if df.empty:
-        print("⚠️ No data in CSV to plot")
-        return
+    print(f"🖼️ Generating IVP Plots...")
 
-    df['timestamp'] = pd.to_datetime(df['timestamp'], format="%Y-%m-%d %H:%M:%S", errors='coerce')
-    df = df.dropna(subset=['timestamp'])
+    try:
+        df = load_existing_csv()
+        if df.empty:
+            print("⚠️ No data in CSV to plot")
+            return
 
-    if df.empty:
-        print("⚠️ All timestamps invalid")
-        return
+        df['timestamp'] = pd.to_datetime(df['timestamp'], errors='coerce')
+        df = df.dropna(subset=['timestamp'])
+        df = df.sort_values("timestamp")
 
-    if 'india_vix' not in df.columns:
-        df['india_vix'] = None
-    df['india_vix'] = df['india_vix'].fillna(method='ffill')
+        # Fill forward india_vix
+        if 'india_vix' not in df.columns:
+            df['india_vix'] = None
+        df['india_vix'] = df['india_vix'].ffill()
 
-    df_nifty = df[[c for c in df.columns if 'nifty' in c.lower() or c == 'timestamp' or c == 'india_vix']].dropna(subset=['timestamp'])
-    df_banknifty = df[[c for c in df.columns if 'banknifty' in c.lower() or c == 'timestamp' or c == 'india_vix']].dropna(subset=['timestamp'])
+        df_nifty = df[[c for c in df.columns if 'nifty' in c.lower()] + ['timestamp', 'india_vix']].copy()
+        df_banknifty = df[[c for c in df.columns if 'banknifty' in c.lower()] + ['timestamp', 'india_vix']].copy()
 
-    if df_nifty.empty or df_banknifty.empty:
-        print("⚠️ Not enough NIFTY or BANKNIFTY data to plot")
-        return
+        if df_nifty.empty or df_banknifty.empty:
+            print("⚠️ Not enough NIFTY or BANKNIFTY data to plot")
+            return
 
-    if SAVE_PDF:
-        date_str = datetime.now(timezone('Asia/Kolkata')).strftime('%Y-%m-%d')
-        os.makedirs("static/reports", exist_ok=True)
-        pdf = PdfPages(f"static/reports/{date_str}.pdf")
+        os.makedirs("static", exist_ok=True)
+        os.makedirs("reports", exist_ok=True)
+        date_str = datetime.now(timezone("Asia/Kolkata")).strftime('%Y-%m-%d')
+        pdf_path = f"reports/{date_str}.pdf"
+        pdf = PdfPages(pdf_path)
 
-    def format_ax(ax):
-        ax.xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
-        ax.tick_params(axis='x', rotation=45)
+        def format_axes(ax):
+            ax.xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
+            ax.tick_params(axis='x', rotation=45)
 
-    def plot_symbol(df_sym, prefix, png_path, title_prefix):
-        fig, axes = plt.subplots(2, 1, figsize=(12, 10), sharex=True)
-        plt.subplots_adjust(hspace=0.4)
+        def plot_symbol(df_sym, prefix, png_path, title_prefix):
+            fig, axes = plt.subplots(2, 1, figsize=(12, 10), sharex=True)
+            plt.subplots_adjust(hspace=0.4)
 
-        ax1 = axes[0]
-        ax1.plot(df_sym['timestamp'], df_sym['india_vix'], label='India VIX', color='red', linestyle=':', linewidth=2)
-        ax1.set_ylabel('India VIX', color='red')
-        ax1.legend(loc='lower left')
+            # Subplot 1 - VIX & IV vs Time
+            ax1 = axes[0]
+            ax1.plot(df_sym['timestamp'], df_sym['india_vix'], label='India VIX', color='red', linestyle='--', linewidth=2)
+            ax1b = ax1.twinx()
+            ax1b.plot(df_sym['timestamp'], df_sym[f'{prefix}_curr_straddle_iv'], label='Curr IV', color='blue', linewidth=2)
+            ax1b.plot(df_sym['timestamp'], df_sym[f'{prefix}_next_straddle_iv'], label='Next IV', color='orange', linewidth=2)
+            ax1.set_ylabel("India VIX", color='red')
+            ax1b.set_ylabel("Straddle IV", color='blue')
+            ax1.set_title(f"VIX & IV vs Time ({title_prefix})")
+            ax1.legend(loc='upper left')
+            ax1b.legend(loc='upper right')
 
-        ax1b = ax1.twinx()
-        ax1b.plot(df_sym['timestamp'], df_sym[f'{prefix}_curr_straddle_iv'], label='Curr Straddle IV', color='darkblue', linewidth=2)
-        ax1b.plot(df_sym['timestamp'], df_sym[f'{prefix}_next_straddle_iv'], label='Next Straddle IV', color='orange', linewidth=2)
-        ax1b.set_ylabel('IV', color='darkblue')
-        ax1b.legend(loc='lower left')
-        ax1.set_title(f'VIX & IV vs Time ({title_prefix})')
+            # Subplot 2 - Spot vs Premium & VWAP
+            ax2 = axes[1]
+            ax2.plot(df_sym['timestamp'], df_sym[f'{prefix}_curr_spot'], label='Spot', color='black', linewidth=2)
+            ax2b = ax2.twinx()
+            ax2b.plot(df_sym['timestamp'], df_sym[f'{prefix}_curr_straddle'], label='Curr Premium', color='blue', linewidth=2)
+            ax2b.plot(df_sym['timestamp'], df_sym[f'{prefix}_curr_VWAP'], label='Curr VWAP', color='blue', linestyle='--', linewidth=2)
+            ax2b.plot(df_sym['timestamp'], df_sym[f'{prefix}_next_straddle'], label='Next Premium', color='orange', linewidth=2)
+            ax2b.plot(df_sym['timestamp'], df_sym[f'{prefix}_next_VWAP'], label='Next VWAP', color='orange', linestyle='--', linewidth=2)
+            ax2.set_ylabel("Spot")
+            ax2b.set_ylabel("Straddle / VWAP")
+            ax2.set_title(f"Spot vs Straddle Premium & VWAP ({title_prefix})")
+            ax2.legend(loc='upper left')
+            ax2b.legend(loc='upper right')
 
-        ax2 = axes[1]
-        ax2.plot(df_sym['timestamp'], df_sym[f'{prefix}_curr_spot'], label='Spot Price', color='grey', linewidth=2)
-        ax2.set_ylabel('Spot Price', color='grey')
-        ax2.legend(loc='lower left')
+            format_axes(ax1)
+            format_axes(ax2)
 
-        ax2b = ax2.twinx()
-        ax2b.plot(df_sym['timestamp'], df_sym[f'{prefix}_curr_straddle'], label='Curr Straddle Premium', color='darkblue', linewidth=2)
-        ax2b.plot(df_sym['timestamp'], df_sym[f'{prefix}_curr_VWAP'], label='Curr VWAP', color='darkblue', linestyle='--', linewidth=2)
-        ax2b.plot(df_sym['timestamp'], df_sym[f'{prefix}_next_straddle'], label='Next Straddle Premium', color='orange', linewidth=2)
-        ax2b.plot(df_sym['timestamp'], df_sym[f'{prefix}_next_VWAP'], label='Next VWAP', color='orange', linestyle='--', linewidth=2)
-        ax2b.set_ylabel('Straddle / VWAP', color='darkblue')
-        ax2b.legend(loc='lower left')
-        ax2.set_title(f'Spot vs Straddle Premium & VWAP ({title_prefix})')
+            plt.tight_layout()
+            if SAVE_PDF:
+                pdf.savefig(fig)
+            if SAVE_PNG:
+                fig.savefig(png_path)
+                print(f"✅ PNG Saved: {png_path}")
+            plt.close(fig)
 
-        for ax in axes:
-            format_ax(ax)
+        plot_symbol(df_nifty, 'nifty', 'static/nifty_ivp_live_plot.png', 'NIFTY')
+        plot_symbol(df_banknifty, 'banknifty', 'static/banknifty_ivp_live_plot.png', 'BANKNIFTY')
 
-        plt.tight_layout()
         if SAVE_PDF:
-            pdf.savefig(fig)
-        if SAVE_PNG:
-            fig.savefig(png_path)
-        plt.close(fig)
+            pdf.close()
+            print(f"✅ PDF Saved: {pdf_path}")
 
-    plot_symbol(df_nifty, 'nifty', 'static/nifty_ivp_live_plot.png', 'NIFTY')
-    print("✅ NIFTY plot saved.")
-
-    plot_symbol(df_banknifty, 'banknifty', 'static/banknifty_ivp_live_plot.png', 'BANKNIFTY')
-    print("✅ BANKNIFTY plot saved.")
-
-    if SAVE_PDF:
-        pdf.close()
+    except Exception as e:
+        print(f"❌ Error in generate_ivp_plots(): {e}")
 # -----------------------------------------
 # ✅ MASTER MAIN LOGIC (GitHub Actions Version)
 # -----------------------------------------
