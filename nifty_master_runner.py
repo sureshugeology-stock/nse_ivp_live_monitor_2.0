@@ -311,7 +311,7 @@ def prepare_combined_row(timestamp, india_vix, nifty_data, banknifty_data):
             print(f"[{label}] Current IV: {straddle_iv}, IVP: {ivp}")
 
             combined_row[f"{label}_VWAP"] = vwap
-            combined_row[f"{label}_IVP"] = ivp
+            combined_row[f"{label}_ivp"] = ivp
 
             if ivp is not None and (ivp > IVP_HIGH or ivp < IVP_LOW):
                 asyncio.run(send_telegram_alert(
