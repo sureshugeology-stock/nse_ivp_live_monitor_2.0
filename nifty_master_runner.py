@@ -411,76 +411,68 @@ def generate_ivp_plots():
 
     if SAVE_PDF:
         pdf.close()
-        print("✅ Full PDF report saved.")
 # -----------------------------------------
-# ✅ MASTER MAIN LOOP (India Market Hours)
+# ✅ MASTER MAIN LOGIC (GitHub Actions Version)
 # -----------------------------------------
 if __name__ == "__main__":
-    print("✅ Starting Master NSE IVP+VWAP+Telegram+Plotter Script!")
+    print("✅ Starting GitHub Actions NSE Monitor...")
 
-    while True:
+    india_time = datetime.now(timezone('Asia/Kolkata'))
+    timestamp = india_time.strftime("%Y-%m-%d %H:%M:%S")
+
+    # DEBUG mode always allowed. Else: Only during market hours.
+    market_open = (
+        DEBUG_MODE or (
+            (india_time.hour == 9 and india_time.minute >= 15) or
+            (10 <= india_time.hour < 15) or
+            (india_time.hour == 15 and india_time.minute <= 30)
+        )
+    )
+
+    if not market_open:
+        print("⏳ Market closed. Exiting gracefully...")
+        exit()
+
+    try:
+        india_time_str = india_time.strftime("%H:%M")
+        india_vix = scrape_india_vix()
+
+        if india_vix is not None:
+            rounded_vix = round(india_vix, 2)
+            print(f"✅ India VIX: {rounded_vix} (Checking thresholds: LOW={VIX_LOW}, HIGH={VIX_HIGH})")
+
+            if rounded_vix >= VIX_HIGH or rounded_vix <= VIX_LOW:
+                alert_msg = f"⚠️ India VIX Alert! VIX={rounded_vix} at {timestamp}"
+                print(f"⚡️ TRIGGERING ALERT: {alert_msg}")
+                asyncio.run(send_telegram_alert(alert_msg))
+        else:
+            print("⚠️ India VIX scrape returned None")
+
+        # --- Step 2️⃣: Fetch Option Chains
+        nifty_data = fetch_option_chain("NIFTY", NIFTY_URL)
+        banknifty_data = fetch_option_chain("BANKNIFTY", BANKNIFTY_URL)
+
+        if not nifty_data or not banknifty_data:
+            print("❗️ Option chain fetch failed. Exiting...")
+            exit()
+
+        # --- Step 3️⃣: Prepare Combined Row
+        combined_row = prepare_combined_row(timestamp, india_vix, nifty_data, banknifty_data)
+        if combined_row:
+            append_row_to_csv(combined_row)
+
+        # --- Step 4️⃣: Generate PNG & PDF
+        generate_ivp_plots()
+
+        print("✅ Script completed one cycle and will now exit.")
+
+    except Exception as e:
+        error_msg = f"❗️ Error in GitHub Actions run: {str(e)}"
+        print(error_msg)
         try:
-            # --- Get current India time (IST)
-            india_time = datetime.now(timezone('Asia/Kolkata'))
-            timestamp = india_time.strftime("%Y-%m-%d %H:%M:%S")
-            ist_hhmm = india_time.strftime("%H:%M")
+            asyncio.run(send_telegram_alert(error_msg))
+        except Exception as te:
+            print(f"❗️ Telegram send error: {te}")
+        exit(1)
 
-            # --- Check if market is open (9:15 to 15:30 IST)
-            market_open = (
-                (india_time.hour == 9 and india_time.minute >= 15)
-                or (10 <= india_time.hour < 15)
-                or (india_time.hour == 15 and india_time.minute <= 30)
-            )
-
-            if not market_open and not DEBUG_MODE:
-                print(f"⏳ Market closed (IST: {india_time.strftime('%H:%M')}). Sleeping {SLEEP_INTERVAL} seconds...")
-                time.sleep(SLEEP_INTERVAL)
-                continue
-            elif not market_open and DEBUG_MODE:
-                print(f"⚡️ DEBUG MODE ACTIVE: Ignoring market hours (IST: {india_time.strftime('%H:%M')})")
-            print(f"\n✅ Cycle started at {timestamp} IST")
-
-            # --- Step 1️⃣: Scrape India VIX
-            india_time_str = india_time.strftime("%H:%M")
-            india_vix = scrape_india_vix()
-
-            if india_vix is not None:
-                rounded_vix = round(india_vix, 2)
-                print(f"✅ India VIX: {rounded_vix} (Checking thresholds: LOW={VIX_LOW}, HIGH={VIX_HIGH})")
-
-                if rounded_vix >= VIX_HIGH or rounded_vix <= VIX_LOW:
-                    alert_msg = f"⚠️ India VIX Alert! VIX={rounded_vix} at {timestamp}"
-                    print(f"⚡️ TRIGGERING ALERT: {alert_msg}")
-                    asyncio.run(send_telegram_alert(alert_msg))
-            else:
-                print("⚠️ India VIX scrape returned None")
-
-            # --- Step 2️⃣: Fetch Option Chains
-            nifty_data = fetch_option_chain("NIFTY", NIFTY_URL)
-            banknifty_data = fetch_option_chain("BANKNIFTY", BANKNIFTY_URL)
-
-            if not nifty_data or not banknifty_data:
-                print("❗️ Option chain fetch failed. Sleeping and skipping cycle.")
-                time.sleep(SLEEP_INTERVAL)
-                continue
-
-            # --- Step 3️⃣: Prepare Combined Row
-            combined_row = prepare_combined_row(timestamp, india_vix, nifty_data, banknifty_data)
-            if combined_row:
-                append_row_to_csv(combined_row)
-
-            # --- Step 4️⃣: Generate PNG & PDF
-            generate_ivp_plots()
-
-            print(f"✅ Cycle complete. Sleeping for {SLEEP_INTERVAL} seconds...\n")
-            time.sleep(SLEEP_INTERVAL)
-
-        except Exception as e:
-            error_msg = f"❗️ Error in master loop: {str(e)}"
-            print(error_msg)
-            try:
-                send_telegram_alert(error_msg)
-            except Exception as te:
-                print(f"❗️ Telegram send error: {te}")
-            time.sleep(SLEEP_INTERVAL)
 
