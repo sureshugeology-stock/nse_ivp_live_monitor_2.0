@@ -1,18 +1,18 @@
 {
-  "name": "NSE IVP Live Monitor",
-  "short_name": "IVP Monitor",
-  "start_url": "/",
+  "name": "NSE IVP Live Dashboard",
+  "short_name": "NSE IVP",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#0a0a0a",
+  "theme_color": "#0f172a",
   "icons": [
     {
-      "src": "/static/icon.png",
+      "src": "static/icon.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/static/icon.png",
+      "src": "static/icon.png",
       "sizes": "512x512",
       "type": "image/png"
     }
