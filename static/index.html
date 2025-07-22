@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NSE IVP Live Monitor</title>
+
+  <!-- Mobile PWA Meta -->
+  <meta name="theme-color" content="#0c1f3c" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <link rel="manifest" href="manifest.json" />
+
+  <!-- Styles -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      color: #222;
+      margin: 0;
+      padding: 1rem;
+    }
+    h1 {
+      color: #003366;
+    }
+    img {
+      max-width: 100%;
+      border: 1px solid #ccc;
+      margin-bottom: 1rem;
+    }
+    .plot-container {
+      margin-bottom: 2rem;
+    }
+    .csv-preview {
+      background: white;
+      padding: 0.5rem;
+      border-radius: 5px;
+      max-height: 200px;
+      overflow: auto;
+      font-size: 0.9rem;
+      white-space: pre;
+      border: 1px solid #ddd;
+    }
+    footer {
+      font-size: 0.8rem;
+      color: #666;
+      text-align: center;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>📊 NSE IVP Live Dashboard</h1>
+
+  <div class="plot-container">
+    <h2>🔹 NIFTY IVP Plot</h2>
+    <img src="nifty_ivp_live_plot.png" alt="NIFTY IVP Plot" />
+  </div>
+
+  <div class="plot-container">
+    <h2>🔸 BANKNIFTY IVP Plot</h2>
+    <img src="banknifty_ivp_live_plot.png" alt="BANKNIFTY IVP Plot" />
+  </div>
+
+  <div class="plot-container">
+    <h2>📈 Latest CSV Data</h2>
+    <div class="csv-preview" id="csv-preview">Loading CSV...</div>
+  </div>
+
+  <footer>
+    Updated every 5 min during market hours · Hosted via GitHub Pages<br />
+    <a href="atm_straddle_combined.csv" download>📥 Download Full CSV</a>
+  </footer>
+
+  <!-- CSV Preview Script -->
+  <script>
+    fetch("atm_straddle_combined.csv")
+      .then((res) => res.text())
+      .then((text) => {
+        const rows = text.trim().split("\n");
+        const last5 = rows.slice(-6); // Header + 5 rows
+        document.getElementById("csv-preview").innerText = last5.join("\n");
+      })
+      .catch((err) => {
+        document.getElementById("csv-preview").innerText = "Failed to load CSV.";
+      });
+  </script>
+
+  <!-- PWA Install Support -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+  </script>
+</body>
+</html>

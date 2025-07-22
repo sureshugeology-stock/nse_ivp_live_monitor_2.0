@@ -1,0 +1,20 @@
+{
+  "name": "NSE IVP Monitor",
+  "short_name": "IVP Monitor",
+  "start_url": "/nse_ivp_live_monitor_2.0/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0d6efd",
+  "icons": [
+    {
+      "src": "/nse_ivp_live_monitor_2.0/static/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/nse_ivp_live_monitor_2.0/static/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

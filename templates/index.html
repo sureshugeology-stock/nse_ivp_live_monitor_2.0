@@ -1,1 +1,100 @@
-<html><head><meta http-equiv='refresh' content='60'></head><body>Live Dashboard</body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0d6efd" />
+  <title>NSE IVP Live Monitor</title>
+
+  <!-- PWA Setup -->
+  <link rel="manifest" href="/nse_ivp_live_monitor_2.0/static/manifest.json" />
+  <link rel="apple-touch-icon" href="/nse_ivp_live_monitor_2.0/static/icon-192.png" />
+  
+  <!-- Refresh plots/CSVs every 5 minutes -->
+  <meta http-equiv="refresh" content="300" />
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    header {
+      background: #0d6efd;
+      color: white;
+      padding: 15px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 22px;
+    }
+    section {
+      margin: 20px auto;
+      max-width: 90%;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      margin-bottom: 20px;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+    }
+    .csv-box {
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      overflow-x: auto;
+      font-size: 14px;
+    }
+    footer {
+      margin-top: 30px;
+      font-size: 12px;
+      color: #666;
+    }
+  </style>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/nse_ivp_live_monitor_2.0/static/service-worker.js')
+          .then(function (reg) {
+            console.log("✅ Service Worker registered:", reg.scope);
+          }).catch(function (err) {
+            console.log("❌ Service Worker registration failed:", err);
+          });
+      });
+    }
+  </script>
+</head>
+
+<body>
+  <header>
+    <h1>📊 NSE IVP Live Dashboard</h1>
+    <p>Updated every 5 min during market hours</p>
+  </header>
+
+  <section>
+    <h2>NIFTY IVP Plot</h2>
+    <img src="/nse_ivp_live_monitor_2.0/static/nifty_ivp_live_plot.png" alt="NIFTY Plot" />
+  </section>
+
+  <section>
+    <h2>BANKNIFTY IVP Plot</h2>
+    <img src="/nse_ivp_live_monitor_2.0/static/banknifty_ivp_live_plot.png" alt="BANKNIFTY Plot" />
+  </section>
+
+  <section>
+    <h2>📄 Latest CSV Snapshot</h2>
+    <div class="csv-box">
+      <iframe src="/nse_ivp_live_monitor_2.0/static/atm_straddle_combined.csv" width="100%" height="200" style="border: none;"></iframe>
+    </div>
+  </section>
+
+  <footer>
+    <p>Powered by NSE IVP Monitor – Last synced: <script>document.write(new Date().toLocaleString())</script></p>
+  </footer>
+</body>
+</html>

@@ -107,7 +107,15 @@ jobs:
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
         git add static || true
         git add reports || true
-        git commit -m "Auto-update plots and CSVs" || echo "Nothing to commit"
+        git add index.html || true
+        git commit -m "Auto-update plots, CSVs and reports" || echo "Nothing to commit"
         git push
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: 📤 Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_branch: gh-pages
+        publish_dir: .

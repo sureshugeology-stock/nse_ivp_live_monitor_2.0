@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="refresh" content="60" /> <!-- Auto-refresh every 60s -->
+  <title>NSE IVP Live Monitor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 10px;
+      background: #f4f4f4;
+      color: #333;
+      max-width: 800px;
+      margin: auto;
+    }
+    h1, h2 {
+      text-align: center;
+    }
+    .status {
+      text-align: center;
+      padding: 10px;
+      font-weight: bold;
+      border-radius: 6px;
+      margin-bottom: 15px;
+    }
+    .open { background-color: #d4edda; color: #155724; }
+    .closed { background-color: #f8d7da; color: #721c24; }
+    .section {
+      background: white;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 6px rgba(0,0,0,0.1);
+    }
+    img {
+      width: 100%;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+    pre {
+      background: #eee;
+      padding: 10px;
+      overflow-x: auto;
+    }
+    a { color: #0066cc; }
+  </style>
+  <script>
+    function checkMarketStatus() {
+      const now = new Date();
+      const istNow = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
+      const hrs = istNow.getHours();
+      const mins = istNow.getMinutes();
+      const isOpen = (hrs > 9 || (hrs === 9 && mins >= 15)) && (hrs < 15 || (hrs === 15 && mins <= 30));
+      const status = document.getElementById("market-status");
+      if (isOpen) {
+        status.innerText = "📈 Market Status: OPEN";
+        status.className = "status open";
+      } else {
+        status.innerText = "🔒 Market Status: CLOSED";
+        status.className = "status closed";
+      }
+    }
+    window.onload = checkMarketStatus;
+  </script>
+</head>
+<body>
+  <h1>NSE IVP Live Dashboard</h1>
+  <div id="market-status" class="status">Checking Market Status...</div>
+
+  <div class="section">
+    <h2>🔍 Latest IVP Charts</h2>
+    <img src="../static/nifty_ivp_live_plot.png" alt="NIFTY IVP Plot" />
+    <img src="../static/banknifty_ivp_live_plot.png" alt="BANKNIFTY IVP Plot" />
+  </div>
+
+  <div class="section">
+    <h2>📄 Daily PDF Report</h2>
+    <p><a href="../reports/latest.pdf" target="_blank">Open Latest PDF Report</a></p>
+  </div>
+
+  <div class="section">
+    <h2>📊 Last 5 Rows of CSV</h2>
+    <div id="csv-preview">Loading...</div>
+    <script>
+      fetch('../static/atm_straddle_combined.csv')
+        .then(res => res.text())
+        .then(csv => {
+          const lines = csv.trim().split('\n');
+          const last = lines.slice(-6); // header + 5 rows
+          document.getElementById('csv-preview').innerHTML = `<pre>${last.join('\n')}</pre>`;
+        });
+    </script>
+  </div>
+</body>
+</html>
