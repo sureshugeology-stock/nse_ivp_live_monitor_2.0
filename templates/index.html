@@ -2,70 +2,62 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#0d6efd" />
-  <title>NSE IVP Live Monitor</title>
-
-  <!-- PWA Setup -->
-  <link rel="manifest" href="/nse_ivp_live_monitor_2.0/static/manifest.json" />
-  <link rel="apple-touch-icon" href="/nse_ivp_live_monitor_2.0/static/icon-192.png" />
-  
-  <!-- Refresh plots/CSVs every 5 minutes -->
-  <meta http-equiv="refresh" content="300" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#0d6efd"/>
+  <meta name="description" content="Live IVP Dashboard for NIFTY and BANKNIFTY" />
+  <link rel="manifest" href="/static/manifest.json">
+  <link rel="icon" type="image/png" href="/static/favicon.png" />
+  <title>NSE IVP Live Dashboard</title>
 
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
+      font-family: 'Segoe UI', sans-serif;
       margin: 0;
       padding: 0;
+      background-color: #f5f5f5;
+      color: #222;
       text-align: center;
     }
     header {
-      background: #0d6efd;
+      background-color: #0d6efd;
       color: white;
-      padding: 15px;
+      padding: 1rem 0;
     }
     h1 {
       margin: 0;
-      font-size: 22px;
+      font-size: 1.5rem;
     }
-    section {
-      margin: 20px auto;
-      max-width: 90%;
+    .container {
+      padding: 1rem;
     }
-    img {
-      max-width: 100%;
+    img.plot {
+      max-width: 95%;
       height: auto;
-      margin-bottom: 20px;
-      border: 2px solid #ccc;
-      border-radius: 8px;
-    }
-    .csv-box {
-      background: white;
+      margin: 1rem 0;
       border: 1px solid #ccc;
-      border-radius: 8px;
-      padding: 10px;
-      overflow-x: auto;
-      font-size: 14px;
+      border-radius: 10px;
     }
-    footer {
-      margin-top: 30px;
-      font-size: 12px;
-      color: #666;
+    a.download-link {
+      display: inline-block;
+      margin: 1rem auto;
+      padding: 0.75rem 1.25rem;
+      font-size: 1rem;
+      background-color: #198754;
+      color: white;
+      border-radius: 8px;
+      text-decoration: none;
+    }
+    a.download-link:hover {
+      background-color: #145c39;
     }
   </style>
 
   <script>
+    // Register service worker
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function () {
-        navigator.serviceWorker.register('/nse_ivp_live_monitor_2.0/static/service-worker.js')
-          .then(function (reg) {
-            console.log("✅ Service Worker registered:", reg.scope);
-          }).catch(function (err) {
-            console.log("❌ Service Worker registration failed:", err);
-          });
-      });
+      navigator.serviceWorker.register('/static/service-worker.js')
+        .then(reg => console.log("✅ Service Worker registered"))
+        .catch(err => console.error("❌ Service Worker failed:", err));
     }
   </script>
 </head>
@@ -73,28 +65,17 @@
 <body>
   <header>
     <h1>📊 NSE IVP Live Dashboard</h1>
-    <p>Updated every 5 min during market hours</p>
   </header>
 
-  <section>
-    <h2>NIFTY IVP Plot</h2>
-    <img src="/nse_ivp_live_monitor_2.0/static/nifty_ivp_live_plot.png" alt="NIFTY Plot" />
-  </section>
+  <div class="container">
+    <h2>🔹 NIFTY IVP Plot</h2>
+    <img class="plot" src="/static/nifty_ivp_live_plot.png" alt="NIFTY IVP Plot" />
 
-  <section>
-    <h2>BANKNIFTY IVP Plot</h2>
-    <img src="/nse_ivp_live_monitor_2.0/static/banknifty_ivp_live_plot.png" alt="BANKNIFTY Plot" />
-  </section>
+    <h2>🔸 BANKNIFTY IVP Plot</h2>
+    <img class="plot" src="/static/banknifty_ivp_live_plot.png" alt="BANKNIFTY IVP Plot" />
 
-  <section>
-    <h2>📄 Latest CSV Snapshot</h2>
-    <div class="csv-box">
-      <iframe src="/nse_ivp_live_monitor_2.0/static/atm_straddle_combined.csv" width="100%" height="200" style="border: none;"></iframe>
-    </div>
-  </section>
-
-  <footer>
-    <p>Powered by NSE IVP Monitor – Last synced: <script>document.write(new Date().toLocaleString())</script></p>
-  </footer>
+    <h2>📈 Latest CSV Data</h2>
+    <a class="download-link" href="/static/ivp_data.csv" target="_blank">Download CSV</a>
+  </div>
 </body>
 </html>
