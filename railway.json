@@ -1,0 +1,3 @@
+{
+  "buildCommand": "python nifty_master_runner.py"
+}
