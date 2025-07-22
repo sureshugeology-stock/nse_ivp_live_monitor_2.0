@@ -25,7 +25,7 @@ from telegram import Bot
 # -----------------------------------------
 # ✅ CONFIGURATION
 # -----------------------------------------
-DEBUG_MODE = True  # Set to True for after-hours testing
+DEBUG_MODE = False  # Set to True for after-hours testing
 STATIC_DIR = "static"
 CSV_FILENAME = os.path.join(STATIC_DIR, "atm_straddle_combined.csv")
 PDF_FOLDER = os.path.join(STATIC_DIR, "reports")
