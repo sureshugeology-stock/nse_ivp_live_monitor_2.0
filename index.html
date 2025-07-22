@@ -3,78 +3,61 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="theme-color" content="#0d6efd"/>
-  <meta name="description" content="Live IVP Dashboard for NIFTY and BANKNIFTY" />
-  <link rel="manifest" href="static/manifest.json">
-  <link rel="icon" type="image/png" href="static/favicon.png" />
+  <meta name="theme-color" content="#111111"/>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="favicon.ico" />
   <title>NSE IVP Live Dashboard</title>
-
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
+      font-family: sans-serif;
+      background-color: #111;
+      color: #fff;
       margin: 0;
-      padding: 0;
-      background-color: #f5f5f5;
-      color: #222;
+      padding: 1rem;
       text-align: center;
     }
-    header {
-      background-color: #0d6efd;
-      color: white;
-      padding: 1rem 0;
-    }
     h1 {
-      margin: 0;
-      font-size: 1.5rem;
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
     }
-    .container {
-      padding: 1rem;
+    .section {
+      margin-bottom: 2rem;
     }
-    img.plot {
+    img {
       max-width: 95%;
       height: auto;
-      margin: 1rem 0;
-      border: 1px solid #ccc;
-      border-radius: 10px;
+      border: 1px solid #333;
+      border-radius: 8px;
+      margin-top: 0.5rem;
     }
     a.download-link {
       display: inline-block;
-      margin: 1rem auto;
-      padding: 0.75rem 1.25rem;
-      font-size: 1rem;
-      background-color: #198754;
+      padding: 0.6rem 1.2rem;
+      background-color: #0d6efd;
       color: white;
-      border-radius: 8px;
+      border-radius: 6px;
       text-decoration: none;
-    }
-    a.download-link:hover {
-      background-color: #145c39;
+      font-weight: bold;
+      margin-top: 1rem;
     }
   </style>
-
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('static/service-worker.js')
-        .then(reg => console.log("✅ Service Worker registered"))
-        .catch(err => console.error("❌ Service Worker failed:", err));
-    }
-  </script>
 </head>
-
 <body>
-  <header>
-    <h1>📊 NSE IVP Live Dashboard</h1>
-  </header>
+  <h1>📊 NSE IVP Live Dashboard</h1>
 
-  <div class="container">
+  <div class="section">
     <h2>🔹 NIFTY IVP Plot</h2>
-    <img class="plot" src="static/nifty_ivp_live_plot.png" alt="NIFTY IVP Plot" />
+    <img src="static/nifty_ivp_live_plot.png" alt="NIFTY IVP Plot" />
+  </div>
 
+  <div class="section">
     <h2>🔸 BANKNIFTY IVP Plot</h2>
-    <img class="plot" src="static/banknifty_ivp_live_plot.png" alt="BANKNIFTY IVP Plot" />
+    <img src="static/banknifty_ivp_live_plot.png" alt="BANKNIFTY IVP Plot" />
+  </div>
 
+  <div class="section">
     <h2>📈 Latest CSV Data</h2>
-    <a class="download-link" href="static/ivp_data.csv" target="_blank">Download CSV</a>
+    <a class="download-link" href="static/atm_straddle_combined.csv" download target="_blank">Download CSV</a>
   </div>
 </body>
 </html>
