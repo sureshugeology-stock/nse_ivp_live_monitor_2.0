@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="theme-color" content="#0d6efd"/>
   <meta name="description" content="Live IVP Dashboard for NIFTY and BANKNIFTY" />
-  <link rel="manifest" href="/static/manifest.json">
-  <link rel="icon" type="image/png" href="/static/favicon.png" />
+  <link rel="manifest" href="static/manifest.json">
+  <link rel="icon" type="image/png" href="static/favicon.png" />
   <title>NSE IVP Live Dashboard</title>
 
   <style>
@@ -53,9 +53,8 @@
   </style>
 
   <script>
-    // Register service worker
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/static/service-worker.js')
+      navigator.serviceWorker.register('static/service-worker.js')
         .then(reg => console.log("✅ Service Worker registered"))
         .catch(err => console.error("❌ Service Worker failed:", err));
     }
@@ -69,13 +68,13 @@
 
   <div class="container">
     <h2>🔹 NIFTY IVP Plot</h2>
-    <img class="plot" src="/static/nifty_ivp_live_plot.png" alt="NIFTY IVP Plot" />
+    <img class="plot" src="static/nifty_ivp_live_plot.png" alt="NIFTY IVP Plot" />
 
     <h2>🔸 BANKNIFTY IVP Plot</h2>
-    <img class="plot" src="/static/banknifty_ivp_live_plot.png" alt="BANKNIFTY IVP Plot" />
+    <img class="plot" src="static/banknifty_ivp_live_plot.png" alt="BANKNIFTY IVP Plot" />
 
     <h2>📈 Latest CSV Data</h2>
-    <a class="download-link" href="/static/ivp_data.csv" target="_blank">Download CSV</a>
+    <a class="download-link" href="static/ivp_data.csv" target="_blank">Download CSV</a>
   </div>
 </body>
 </html>
