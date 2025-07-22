@@ -2,62 +2,92 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="theme-color" content="#111111"/>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="favicon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NSE IVP Live Dashboard</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="static/manifest.json" />
+  <meta name="theme-color" content="#0f172a" />
+  <link rel="apple-touch-icon" href="static/icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
   <style>
     body {
-      font-family: sans-serif;
-      background-color: #111;
-      color: #fff;
+      font-family: system-ui, sans-serif;
       margin: 0;
       padding: 1rem;
-      text-align: center;
+      background: #f9fafb;
+      color: #111827;
     }
     h1 {
-      font-size: 1.8rem;
+      font-size: 1.75rem;
       margin-bottom: 1rem;
+      color: #0f172a;
     }
-    .section {
+    section {
       margin-bottom: 2rem;
     }
     img {
-      max-width: 95%;
+      max-width: 100%;
       height: auto;
-      border: 1px solid #333;
+      border: 1px solid #ccc;
       border-radius: 8px;
-      margin-top: 0.5rem;
     }
-    a.download-link {
+    a.button {
       display: inline-block;
-      padding: 0.6rem 1.2rem;
-      background-color: #0d6efd;
-      color: white;
-      border-radius: 6px;
-      text-decoration: none;
-      font-weight: bold;
       margin-top: 1rem;
+      padding: 0.6rem 1rem;
+      background: #1d4ed8;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+    }
+    a.button:hover {
+      background: #2563eb;
+    }
+    footer {
+      text-align: center;
+      margin-top: 2rem;
+      color: #6b7280;
+      font-size: 0.9rem;
     }
   </style>
 </head>
 <body>
   <h1>📊 NSE IVP Live Dashboard</h1>
 
-  <div class="section">
+  <section>
     <h2>🔹 NIFTY IVP Plot</h2>
     <img src="static/nifty_ivp_live_plot.png" alt="NIFTY IVP Plot" />
-  </div>
+  </section>
 
-  <div class="section">
+  <section>
     <h2>🔸 BANKNIFTY IVP Plot</h2>
     <img src="static/banknifty_ivp_live_plot.png" alt="BANKNIFTY IVP Plot" />
-  </div>
+  </section>
 
-  <div class="section">
+  <section>
     <h2>📈 Latest CSV Data</h2>
-    <a class="download-link" href="static/atm_straddle_combined.csv" download target="_blank">Download CSV</a>
-  </div>
+    <a class="button" href="static/atm_straddle_combined.csv" download>⬇️ Download CSV</a>
+  </section>
+
+  <section>
+    <h2>📄 Daily PDF Report</h2>
+    <a class="button" href="reports/2025-07-22.pdf" download>📥 Download PDF</a>
+  </section>
+
+  <footer>
+    &copy; 2025 NSE IVP Monitor — Built with ❤️ by You + ChatGPT
+  </footer>
+
+  <!-- Register Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('static/service-worker.js')
+        .then(reg => console.log('✅ Service worker registered'))
+        .catch(err => console.error('❌ SW registration failed:', err));
+    }
+  </script>
 </body>
 </html>
