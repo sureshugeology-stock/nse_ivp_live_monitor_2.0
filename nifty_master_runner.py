@@ -296,6 +296,7 @@ def prepare_combined_row(timestamp, india_vix, nifty_data, banknifty_data):
             combined_row[f"{label}_straddle_iv"] = straddle_iv
 
             df_existing = load_existing_csv()
+            df_existing.columns = [col.lower() for col in df_existing.columns]
             filter_cols = [col for col in df_existing.columns if label in col]
             df_symbol_expiry = df_existing[["timestamp"] + filter_cols] if not df_existing.empty else pd.DataFrame()
             df_symbol_expiry = df_symbol_expiry.tail(LOOKBACK)
@@ -310,7 +311,7 @@ def prepare_combined_row(timestamp, india_vix, nifty_data, banknifty_data):
 
             print(f"[{label}] Current IV: {straddle_iv}, IVP: {ivp}")
 
-            combined_row[f"{label}_VWAP"] = vwap
+            combined_row[f"{label}_vwap"] = vwap
             combined_row[f"{label}_ivp"] = ivp
 
             if ivp is not None and (ivp > IVP_HIGH or ivp < IVP_LOW):
