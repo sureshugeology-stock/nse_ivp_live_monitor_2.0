@@ -48,7 +48,7 @@ IVP_LOW = 10
 VWAP_FACTOR_HIGH = 1.5
 VWAP_FACTOR_LOW = 0.5
 
-SAVE_PDF = True
+SAVE_PDF = False
 SAVE_PNG = True
 
 USER_AGENTS = [
@@ -382,7 +382,7 @@ def generate_ivp_plots():
                 ax1b.plot(df_sym['timestamp'], df_sym[f'{prefix}_curr_straddle_iv'], label='Curr IV', color='blue', linewidth=2)
                 ax1b.plot(df_sym['timestamp'], df_sym[f'{prefix}_next_straddle_iv'], label='Next IV', color='orange', linewidth=2)
                 ax1b.set_ylabel("Straddle IV", color='blue')
-                ax1b.legend(loc='lower right')
+                ax1b.legend(loc='upper left')
             ax1.legend(loc='lower left')
 
             # Subplot 2: Spot vs Premium + VWAP
@@ -401,7 +401,7 @@ def generate_ivp_plots():
             ax2b.set_ylabel("Straddle / VWAP")
             ax2.set_title(f"Spot vs Straddle Premium & VWAP ({title_prefix})")
             ax2.legend(loc='lower left')
-            ax2b.legend(loc='lower right')
+            ax2b.legend(loc='upper left')
 
             # Subplot 3: Spot vs IVP%
             ivp_curr_col = f'{prefix}_curr_ivp'
@@ -416,7 +416,7 @@ def generate_ivp_plots():
                 ax3b.set_ylabel('IVP %', color='green')
                 ax3.set_title(f"Spot vs IVP% ({title_prefix})")
                 ax3.legend(loc='lower left')
-                ax3b.legend(loc='lower right')
+                ax3b.legend(loc='upper left')
                 format_axes(ax3)
             else:
                 print(f"⚠️ Skipping IVP% subplot for {prefix}: IVP columns not found")
