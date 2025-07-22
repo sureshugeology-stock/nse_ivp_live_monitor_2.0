@@ -391,15 +391,15 @@ def generate_ivp_plots():
             ax2b = ax2.twinx()
             if f'{prefix}_curr_straddle' in df_sym.columns:
                 ax2b.plot(df_sym['timestamp'], df_sym[f'{prefix}_curr_straddle'], label='Curr Premium', color='blue', linewidth=2)
-            if f'{prefix}_curr_VWAP' in df_sym.columns:
-                ax2b.plot(df_sym['timestamp'], df_sym[f'{prefix}_curr_VWAP'], label='Curr VWAP', color='blue', linestyle='--', linewidth=2)
+            if f'{prefix}_curr_vwap' in df_sym.columns:
+                ax2b.plot(df_sym['timestamp'], df_sym[f'{prefix}_curr_vwap'], label='Curr vwap', color='blue', linestyle='--', linewidth=2)
             if f'{prefix}_next_straddle' in df_sym.columns:
                 ax2b.plot(df_sym['timestamp'], df_sym[f'{prefix}_next_straddle'], label='Next Premium', color='orange', linewidth=2)
-            if f'{prefix}_next_VWAP' in df_sym.columns:
-                ax2b.plot(df_sym['timestamp'], df_sym[f'{prefix}_next_VWAP'], label='Next VWAP', color='orange', linestyle='--', linewidth=2)
+            if f'{prefix}_next_vwap' in df_sym.columns:
+                ax2b.plot(df_sym['timestamp'], df_sym[f'{prefix}_next_vwap'], label='Next vwap', color='orange', linestyle='--', linewidth=2)
             ax2.set_ylabel("Spot")
-            ax2b.set_ylabel("Straddle / VWAP")
-            ax2.set_title(f"Spot vs Straddle Premium & VWAP ({title_prefix})")
+            ax2b.set_ylabel("Straddle / vwap")
+            ax2.set_title(f"Spot vs Straddle Premium & vwap ({title_prefix})")
             ax2.legend(loc='lower left')
             ax2b.legend(loc='lower right')
 
