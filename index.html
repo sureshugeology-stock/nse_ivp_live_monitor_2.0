@@ -2,96 +2,80 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NSE IVP Live Monitor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#0d6efd"/>
+  <meta name="description" content="Live IVP Dashboard for NIFTY and BANKNIFTY" />
+  <link rel="manifest" href="/static/manifest.json">
+  <link rel="icon" type="image/png" href="/static/favicon.png" />
+  <title>NSE IVP Live Dashboard</title>
 
-  <!-- Mobile PWA Meta -->
-  <meta name="theme-color" content="#0c1f3c" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="apple-touch-icon" href="icon-192.png" />
-  <link rel="manifest" href="manifest.json" />
-
-  <!-- Styles -->
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f0f4f8;
-      color: #222;
+      font-family: 'Segoe UI', sans-serif;
       margin: 0;
-      padding: 1rem;
+      padding: 0;
+      background-color: #f5f5f5;
+      color: #222;
+      text-align: center;
+    }
+    header {
+      background-color: #0d6efd;
+      color: white;
+      padding: 1rem 0;
     }
     h1 {
-      color: #003366;
+      margin: 0;
+      font-size: 1.5rem;
     }
-    img {
-      max-width: 100%;
+    .container {
+      padding: 1rem;
+    }
+    img.plot {
+      max-width: 95%;
+      height: auto;
+      margin: 1rem 0;
       border: 1px solid #ccc;
-      margin-bottom: 1rem;
+      border-radius: 10px;
     }
-    .plot-container {
-      margin-bottom: 2rem;
+    a.download-link {
+      display: inline-block;
+      margin: 1rem auto;
+      padding: 0.75rem 1.25rem;
+      font-size: 1rem;
+      background-color: #198754;
+      color: white;
+      border-radius: 8px;
+      text-decoration: none;
     }
-    .csv-preview {
-      background: white;
-      padding: 0.5rem;
-      border-radius: 5px;
-      max-height: 200px;
-      overflow: auto;
-      font-size: 0.9rem;
-      white-space: pre;
-      border: 1px solid #ddd;
-    }
-    footer {
-      font-size: 0.8rem;
-      color: #666;
-      text-align: center;
-      margin-top: 2rem;
+    a.download-link:hover {
+      background-color: #145c39;
     }
   </style>
-</head>
-<body>
-  <h1>📊 NSE IVP Live Dashboard</h1>
 
-  <div class="plot-container">
-    <h2>🔹 NIFTY IVP Plot</h2>
-    <img src="nifty_ivp_live_plot.png" alt="NIFTY IVP Plot" />
-  </div>
-
-  <div class="plot-container">
-    <h2>🔸 BANKNIFTY IVP Plot</h2>
-    <img src="banknifty_ivp_live_plot.png" alt="BANKNIFTY IVP Plot" />
-  </div>
-
-  <div class="plot-container">
-    <h2>📈 Latest CSV Data</h2>
-    <div class="csv-preview" id="csv-preview">Loading CSV...</div>
-  </div>
-
-  <footer>
-    Updated every 5 min during market hours · Hosted via GitHub Pages<br />
-    <a href="atm_straddle_combined.csv" download>📥 Download Full CSV</a>
-  </footer>
-
-  <!-- CSV Preview Script -->
   <script>
-    fetch("atm_straddle_combined.csv")
-      .then((res) => res.text())
-      .then((text) => {
-        const rows = text.trim().split("\n");
-        const last5 = rows.slice(-6); // Header + 5 rows
-        document.getElementById("csv-preview").innerText = last5.join("\n");
-      })
-      .catch((err) => {
-        document.getElementById("csv-preview").innerText = "Failed to load CSV.";
-      });
-  </script>
-
-  <!-- PWA Install Support -->
-  <script>
+    // Register service worker
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js');
+      navigator.serviceWorker.register('/static/service-worker.js')
+        .then(reg => console.log("✅ Service Worker registered"))
+        .catch(err => console.error("❌ Service Worker failed:", err));
     }
   </script>
+</head>
+
+<body>
+  <header>
+    <h1>📊 NSE IVP Live Dashboard</h1>
+  </header>
+
+  <div class="container">
+    <h2>🔹 NIFTY IVP Plot</h2>
+    <img class="plot" src="/static/nifty_ivp_live_plot.png" alt="NIFTY IVP Plot" />
+
+    <h2>🔸 BANKNIFTY IVP Plot</h2>
+    <img class="plot" src="/static/banknifty_ivp_live_plot.png" alt="BANKNIFTY IVP Plot" />
+
+    <h2>📈 Latest CSV Data</h2>
+    <a class="download-link" href="/static/ivp_data.csv" target="_blank">Download CSV</a>
+  </div>
 </body>
 </html>
