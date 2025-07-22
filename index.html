@@ -3,94 +3,95 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="refresh" content="60" /> <!-- Auto-refresh every 60s -->
   <title>NSE IVP Live Monitor</title>
+
+  <!-- Mobile PWA Meta -->
+  <meta name="theme-color" content="#0c1f3c" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <link rel="manifest" href="manifest.json" />
+
+  <!-- Styles -->
   <style>
     body {
       font-family: Arial, sans-serif;
-      padding: 10px;
-      background: #f4f4f4;
-      color: #333;
-      max-width: 800px;
-      margin: auto;
+      background: #f0f4f8;
+      color: #222;
+      margin: 0;
+      padding: 1rem;
     }
-    h1, h2 {
-      text-align: center;
-    }
-    .status {
-      text-align: center;
-      padding: 10px;
-      font-weight: bold;
-      border-radius: 6px;
-      margin-bottom: 15px;
-    }
-    .open { background-color: #d4edda; color: #155724; }
-    .closed { background-color: #f8d7da; color: #721c24; }
-    .section {
-      background: white;
-      padding: 10px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      box-shadow: 0 0 6px rgba(0,0,0,0.1);
+    h1 {
+      color: #003366;
     }
     img {
-      width: 100%;
-      border-radius: 6px;
-      margin-bottom: 10px;
+      max-width: 100%;
+      border: 1px solid #ccc;
+      margin-bottom: 1rem;
     }
-    pre {
-      background: #eee;
-      padding: 10px;
-      overflow-x: auto;
+    .plot-container {
+      margin-bottom: 2rem;
     }
-    a { color: #0066cc; }
+    .csv-preview {
+      background: white;
+      padding: 0.5rem;
+      border-radius: 5px;
+      max-height: 200px;
+      overflow: auto;
+      font-size: 0.9rem;
+      white-space: pre;
+      border: 1px solid #ddd;
+    }
+    footer {
+      font-size: 0.8rem;
+      color: #666;
+      text-align: center;
+      margin-top: 2rem;
+    }
   </style>
-  <script>
-    function checkMarketStatus() {
-      const now = new Date();
-      const istNow = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
-      const hrs = istNow.getHours();
-      const mins = istNow.getMinutes();
-      const isOpen = (hrs > 9 || (hrs === 9 && mins >= 15)) && (hrs < 15 || (hrs === 15 && mins <= 30));
-      const status = document.getElementById("market-status");
-      if (isOpen) {
-        status.innerText = "📈 Market Status: OPEN";
-        status.className = "status open";
-      } else {
-        status.innerText = "🔒 Market Status: CLOSED";
-        status.className = "status closed";
-      }
-    }
-    window.onload = checkMarketStatus;
-  </script>
 </head>
 <body>
-  <h1>NSE IVP Live Dashboard</h1>
-  <div id="market-status" class="status">Checking Market Status...</div>
+  <h1>📊 NSE IVP Live Dashboard</h1>
 
-  <div class="section">
-    <h2>🔍 Latest IVP Charts</h2>
-    <img src="../static/nifty_ivp_live_plot.png" alt="NIFTY IVP Plot" />
-    <img src="../static/banknifty_ivp_live_plot.png" alt="BANKNIFTY IVP Plot" />
+  <div class="plot-container">
+    <h2>🔹 NIFTY IVP Plot</h2>
+    <img src="nifty_ivp_live_plot.png" alt="NIFTY IVP Plot" />
   </div>
 
-  <div class="section">
-    <h2>📄 Daily PDF Report</h2>
-    <p><a href="../reports/latest.pdf" target="_blank">Open Latest PDF Report</a></p>
+  <div class="plot-container">
+    <h2>🔸 BANKNIFTY IVP Plot</h2>
+    <img src="banknifty_ivp_live_plot.png" alt="BANKNIFTY IVP Plot" />
   </div>
 
-  <div class="section">
-    <h2>📊 Last 5 Rows of CSV</h2>
-    <div id="csv-preview">Loading...</div>
-    <script>
-      fetch('../static/atm_straddle_combined.csv')
-        .then(res => res.text())
-        .then(csv => {
-          const lines = csv.trim().split('\n');
-          const last = lines.slice(-6); // header + 5 rows
-          document.getElementById('csv-preview').innerHTML = `<pre>${last.join('\n')}</pre>`;
-        });
-    </script>
+  <div class="plot-container">
+    <h2>📈 Latest CSV Data</h2>
+    <div class="csv-preview" id="csv-preview">Loading CSV...</div>
   </div>
+
+  <footer>
+    Updated every 5 min during market hours · Hosted via GitHub Pages<br />
+    <a href="atm_straddle_combined.csv" download>📥 Download Full CSV</a>
+  </footer>
+
+  <!-- CSV Preview Script -->
+  <script>
+    fetch("atm_straddle_combined.csv")
+      .then((res) => res.text())
+      .then((text) => {
+        const rows = text.trim().split("\n");
+        const last5 = rows.slice(-6); // Header + 5 rows
+        document.getElementById("csv-preview").innerText = last5.join("\n");
+      })
+      .catch((err) => {
+        document.getElementById("csv-preview").innerText = "Failed to load CSV.";
+      });
+  </script>
+
+  <!-- PWA Install Support -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+  </script>
 </body>
 </html>
