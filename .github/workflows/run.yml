@@ -2,7 +2,7 @@ name: Run NSE IVP Monitor Every 5 Min During Market Hours
 
 on:
   schedule:
-    # Runs every 5 min from 09:15 to 15:30 IST (03:45–10:00 UTC), Mon–Fri
+    # Every 5 minutes during Indian market hours: 09:15–15:30 IST = 03:45–10:00 UTC
     - cron: '45 3 * * 1-5'
     - cron: '50 3 * * 1-5'
     - cron: '55 3 * * 1-5'
@@ -73,7 +73,6 @@ on:
     - cron: '20 9 * * 1-5'
     - cron: '25 9 * * 1-5'
     - cron: '30 9 * * 1-5'
-
   workflow_dispatch:
 
 jobs:
@@ -84,31 +83,40 @@ jobs:
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
 
     steps:
-      - name: 📥 Checkout Repository
-        uses: actions/checkout@v4
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
 
-      - name: 🐍 Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
 
-      - name: 📦 Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+    - name: 📦 Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
 
-      - name: 🚀 Run NSE Master Script
-        run: |
-          python nifty_master_runner.py
+    - name: 🚀 Run NSE Master Script
+      run: |
+        python nifty_master_runner.py
 
-      - name: 💾 Commit & Push Updated Files
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add static || true
-          git add reports || true
-          git add index.html || true
-          git commit -m "Auto-update plots, CSVs and reports" || echo "Nothing to commit"
+    - name: 💾 Commit & Push Only If Files Changed
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        git add static reports index.html || true
+        if ! git diff --cached --quiet; then
+          git commit -m "Auto-update plots, CSVs and reports"
           git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        else
+          echo "✅ No changes to commit."
+        fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: 📤 Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_branch: gh-pages
+        publish_dir: .
