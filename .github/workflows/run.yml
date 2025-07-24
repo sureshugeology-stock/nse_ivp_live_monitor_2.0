@@ -2,125 +2,16 @@ name: Run NSE IVP Monitor Every 6 Min During Market Hours
 
 on:
   schedule:
-    # Regular 6-min interval runs (Indian market time 09:15 to 15:30 IST)
-    - cron: '45 3 * * 1-5'
-    - cron: '51 3 * * 1-5'
-    - cron: '57 3 * * 1-5'
-    - cron: '3 4 * * 1-5'
-    - cron: '9 4 * * 1-5'
-    - cron: '15 4 * * 1-5'
-    - cron: '21 4 * * 1-5'
-    - cron: '27 4 * * 1-5'
-    - cron: '33 4 * * 1-5'
-    - cron: '39 4 * * 1-5'
-    - cron: '45 4 * * 1-5'
-    - cron: '51 4 * * 1-5'
-    - cron: '57 4 * * 1-5'
-    - cron: '3 5 * * 1-5'
-    - cron: '9 5 * * 1-5'
-    - cron: '15 5 * * 1-5'
-    - cron: '21 5 * * 1-5'
-    - cron: '27 5 * * 1-5'
-    - cron: '33 5 * * 1-5'
-    - cron: '39 5 * * 1-5'
-    - cron: '45 5 * * 1-5'
-    - cron: '51 5 * * 1-5'
-    - cron: '57 5 * * 1-5'
-    - cron: '3 6 * * 1-5'
-    - cron: '9 6 * * 1-5'
-    - cron: '15 6 * * 1-5'
-    - cron: '21 6 * * 1-5'
-    - cron: '27 6 * * 1-5'
-    - cron: '33 6 * * 1-5'
-    - cron: '39 6 * * 1-5'
-    - cron: '45 6 * * 1-5'
-    - cron: '51 6 * * 1-5'
-    - cron: '57 6 * * 1-5'
-    - cron: '3 7 * * 1-5'
-    - cron: '9 7 * * 1-5'
-    - cron: '15 7 * * 1-5'
-    - cron: '21 7 * * 1-5'
-    - cron: '27 7 * * 1-5'
-    - cron: '33 7 * * 1-5'
-    - cron: '39 7 * * 1-5'
-    - cron: '45 7 * * 1-5'
-    - cron: '51 7 * * 1-5'
-    - cron: '57 7 * * 1-5'
-    - cron: '3 8 * * 1-5'
-    - cron: '9 8 * * 1-5'
-    - cron: '15 8 * * 1-5'
-    - cron: '21 8 * * 1-5'
-    - cron: '27 8 * * 1-5'
-    - cron: '33 8 * * 1-5'
-    - cron: '39 8 * * 1-5'
-    - cron: '45 8 * * 1-5'
-    - cron: '51 8 * * 1-5'
-    - cron: '57 8 * * 1-5'
-    - cron: '3 9 * * 1-5'
-    - cron: '9 9 * * 1-5'
-    - cron: '15 9 * * 1-5'
-    - cron: '21 9 * * 1-5'
-    - cron: '27 9 * * 1-5'
-
-    # Special alert job: 09:15 AM IST (03:45 UTC) and 03:30 PM IST (10:00 UTC)
-    - cron: '45 3 * * 1-5'
-    - cron: '0 10 * * 1-5'
-
+    - cron: '*/6 3-9 * * 1-5'
   workflow_dispatch:
 
 jobs:
   build:
-    if: github.event.schedule != '0 10 * * 1-5' && github.event.schedule != '45 3 * * 1-5'
     runs-on: ubuntu-latest
     env:
       TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
 
-    steps:
-    - name: 📥 Checkout Repository
-      uses: actions/checkout@v4
-
-    - name: 🐍 Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-
-    - name: 📦 Install Dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-
-    - name: 🚀 Run NSE Master Script
-      run: |
-        python nifty_master_runner.py
-
-    - name: 💾 Commit & Push Only If Files Changed
-      run: |
-        git config --global user.name 'github-actions[bot]'
-        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-        git add static reports index.html || true
-        if ! git diff --cached --quiet; then
-          git commit -m "Auto-update plots, CSVs and reports"
-          git push
-        else
-          echo "✅ No changes to commit."
-        fi
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: 📤 Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_branch: gh-pages
-        publish_dir: .
-
-  alert:
-    if: github.event.schedule == '0 10 * * 1-5' || github.event.schedule == '45 3 * * 1-5'
-    runs-on: ubuntu-latest
-    env:
-      TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
     steps:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
@@ -132,8 +23,29 @@ jobs:
 
       - name: 📦 Install Dependencies
         run: |
-          pip install requests
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-      - name: 💬 Run Telegram Market Alert Script
+      - name: 🚀 Run NSE Master Script
+        run: python nifty_master_runner.py
+
+      - name: 💾 Commit & Push Only If Files Changed
         run: |
-          python market_alert_runner.py
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add static reports index.html || true
+          if ! git diff --cached --quiet; then
+            git commit -m "Auto-update plots, CSVs and reports"
+            git push
+          else
+            echo "✅ No changes to commit."
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 📤 Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: .
