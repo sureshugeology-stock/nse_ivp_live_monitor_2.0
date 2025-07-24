@@ -505,4 +505,11 @@ if __name__ == "__main__":
             print(f"❗️ Telegram send error: {te}")
         exit(1)
 
-
+# ✅ Increment run count (even if outside try block)
+try:
+    from market_alert_runner import read_run_count, write_run_count
+    count = read_run_count()
+    write_run_count(count + 1)
+    print(f"📟 Run count updated to: {count + 1}")
+except Exception as e:
+    print("⚠️ Failed to update run count:", e)
