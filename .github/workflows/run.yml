@@ -2,7 +2,7 @@ name: Run NSE IVP Monitor Every 6 Min During Market Hours
 
 on:
   schedule:
-    # Every 6 minutes during Indian market hours (09:15–15:30 IST)
+    # Regular 6-min interval runs (Indian market time 09:15 to 15:30 IST)
     - cron: '45 3 * * 1-5'
     - cron: '51 3 * * 1-5'
     - cron: '57 3 * * 1-5'
@@ -61,17 +61,16 @@ on:
     - cron: '15 9 * * 1-5'
     - cron: '21 9 * * 1-5'
     - cron: '27 9 * * 1-5'
-    - cron: '33 9 * * 1-5'
-    - cron: '39 9 * * 1-5'
-    - cron: '45 9 * * 1-5'
-    - cron: '51 9 * * 1-5'
-    - cron: '57 9 * * 1-5'
+
+    # Special alert job: 09:15 AM IST (03:45 UTC) and 03:30 PM IST (10:00 UTC)
+    - cron: '45 3 * * 1-5'
     - cron: '0 10 * * 1-5'
 
   workflow_dispatch:
 
 jobs:
   build:
+    if: github.event.schedule != '0 10 * * 1-5' && github.event.schedule != '45 3 * * 1-5'
     runs-on: ubuntu-latest
     env:
       TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
@@ -115,3 +114,26 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_branch: gh-pages
         publish_dir: .
+
+  alert:
+    if: github.event.schedule == '0 10 * * 1-5' || github.event.schedule == '45 3 * * 1-5'
+    runs-on: ubuntu-latest
+    env:
+      TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 📦 Install Dependencies
+        run: |
+          pip install requests
+
+      - name: 💬 Run Telegram Market Alert Script
+        run: |
+          python market_alert_runner.py

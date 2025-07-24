@@ -492,17 +492,27 @@ if __name__ == "__main__":
             append_row_to_csv(combined_row)
 
         # --- Step 4️⃣: Generate PNG & PDF
+
         generate_ivp_plots()
 
+        # ✅ Count this as a successful run
+        import os
+        def increment_run_count():
+            try:
+                os.makedirs(".runlog", exist_ok=True)
+                path = ".runlog/run_count.txt"
+                if os.path.exists(path):
+                    with open(path, "r") as f:
+                        count = int(f.read().strip()) + 1
+                else:
+                    count = 1
+                with open(path, "w") as f:
+                    f.write(str(count))
+                print(f"📟 Run count updated: {count}")
+            except Exception as e:
+                print("⚠️ Failed to update run count:", e)
+
+        increment_run_count()
+
         print("✅ Script completed one cycle and will now exit.")
-
-    except Exception as e:
-        error_msg = f"❗️ Error in GitHub Actions run: {str(e)}"
-        print(error_msg)
-        try:
-            asyncio.run(send_telegram_alert(error_msg))
-        except Exception as te:
-            print(f"❗️ Telegram send error: {te}")
-        exit(1)
-
 
