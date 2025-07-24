@@ -492,7 +492,6 @@ if __name__ == "__main__":
             append_row_to_csv(combined_row)
 
         # --- Step 4️⃣: Generate PNG & PDF
-
         generate_ivp_plots()
 
         print("✅ Script completed one cycle and will now exit.")
@@ -501,18 +500,16 @@ if __name__ == "__main__":
         error_msg = f"❗️ Error in GitHub Actions run: {str(e)}"
         print(error_msg)
         try:
-            import asyncio
-            from telegram_utils import send_telegram_alert  # <-- Adjust if needed
             asyncio.run(send_telegram_alert(error_msg))
         except Exception as te:
             print(f"❗️ Telegram send error: {te}")
         exit(1)
 
-   # ✅ Increment run count (even if outside try block)
-   try:
-       from market_alert_runner import read_run_count, write_run_count
-       count = read_run_count()
-       write_run_count(count + 1)
-       print(f"📟 Run count updated to: {count + 1}")
-   except Exception as e:
-       print("⚠️ Failed to update run count:", e)
+# ✅ Increment run count (even if outside try block)
+try:
+    from market_alert_runner import read_run_count, write_run_count
+    count = read_run_count()
+    write_run_count(count + 1)
+    print(f"📟 Run count updated to: {count + 1}")
+except Exception as e:
+    print("⚠️ Failed to update run count:", e)
