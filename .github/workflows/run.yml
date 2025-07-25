@@ -52,7 +52,7 @@ jobs:
       - name: 🚀 Run NSE Master Script
         run: python nifty_master_runner.py
 
-      - name: 💾 Commit & Push Only If Files Changed
+       - name: 💾 Commit & Push Only If Files Changed
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
@@ -63,6 +63,7 @@ jobs:
           else
             echo "✅ No changes to commit."
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 📤 Deploy to GitHub Pages
