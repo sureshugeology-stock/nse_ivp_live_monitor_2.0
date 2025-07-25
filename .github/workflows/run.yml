@@ -2,42 +2,7 @@ name: Run NSE IVP Monitor Every 10 Min During Market Hours
 
 on:
   schedule:
-    # Every 10 min from 03:45 UTC to 10:00 UTC (9:15 AM to 3:30 PM IST)
-    - cron: '45 3 * * 1-5'
-    - cron: '55 3 * * 1-5'
-    - cron: '5 4 * * 1-5'
-    - cron: '15 4 * * 1-5'
-    - cron: '25 4 * * 1-5'
-    - cron: '35 4 * * 1-5'
-    - cron: '45 4 * * 1-5'
-    - cron: '55 4 * * 1-5'
-    - cron: '5 5 * * 1-5'
-    - cron: '15 5 * * 1-5'
-    - cron: '25 5 * * 1-5'
-    - cron: '35 5 * * 1-5'
-    - cron: '45 5 * * 1-5'
-    - cron: '55 5 * * 1-5'
-    - cron: '5 6 * * 1-5'
-    - cron: '15 6 * * 1-5'
-    - cron: '25 6 * * 1-5'
-    - cron: '35 6 * * 1-5'
-    - cron: '45 6 * * 1-5'
-    - cron: '55 6 * * 1-5'
-    - cron: '5 7 * * 1-5'
-    - cron: '15 7 * * 1-5'
-    - cron: '25 7 * * 1-5'
-    - cron: '35 7 * * 1-5'
-    - cron: '45 7 * * 1-5'
-    - cron: '55 7 * * 1-5'
-    - cron: '5 8 * * 1-5'
-    - cron: '15 8 * * 1-5'
-    - cron: '25 8 * * 1-5'
-    - cron: '35 8 * * 1-5'
-    - cron: '45 8 * * 1-5'
-    - cron: '55 8 * * 1-5'
-    - cron: '5 9 * * 1-5'
-    - cron: '15 9 * * 1-5'
-    - cron: '25 9 * * 1-5'
+    - cron: '*/10 3-9 * * 1-5'  # Every 10 minutes from 08:30 to 15:30 IST (03:00 to 09:30 UTC)
   workflow_dispatch:
 
 jobs:
@@ -62,7 +27,8 @@ jobs:
           pip install -r requirements.txt
 
       - name: 🚀 Run NSE Master Script
-        run: python nifty_master_runner.py
+        run: |
+          python nifty_master_runner.py
 
       - name: 💾 Commit & Push Only If Files Changed
         run: |
