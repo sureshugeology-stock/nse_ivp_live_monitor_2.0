@@ -1,18 +1,13 @@
-name: Run NSE IVP Monitor Every 15 Min During Market Hours
+name: Run NSE IVP Monitor Every 10 Min During Market Hours
 
 on:
   schedule:
-    - cron: '*/15 3-9 * * 1-5'  # Every 15 min, 08:30–14:30 UTC (Mon–Fri)
-  workflow_dispatch:           # Allow manual run from GitHub UI
-
-concurrency:
-  group: ivp-scheduler
-  cancel-in-progress: true
+    - cron: '45 3-9/1 * * 1-5'  # 9:15 AM IST to 3:25 PM IST every 10 min approx
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     env:
       TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -36,8 +31,8 @@ jobs:
 
       - name: 💾 Commit & Push Only If Files Changed
         run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add static reports index.html || true
           if ! git diff --cached --quiet; then
             git commit -m "Auto-update plots, CSVs and reports"
@@ -51,5 +46,5 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: .
           publish_branch: gh-pages
+          publish_dir: .
