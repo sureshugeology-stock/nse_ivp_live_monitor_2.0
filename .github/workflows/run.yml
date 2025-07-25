@@ -1,8 +1,31 @@
-name: Run NSE IVP Monitor Every 10 Min During Market Hours
+name: Run NSE IVP Monitor Every 15 Min During Market Hours
 
 on:
   schedule:
-    - cron: '45 3-9/1 * * 1-5'  # 9:15 AM IST to 3:25 PM IST every 10 min approx
+    # Every 15 minutes from 03:45 to 10:00 UTC (i.e., 9:15 AM to 3:30 PM IST)
+    - cron: '45 3 * * 1-5'
+    - cron: '0 4 * * 1-5'
+    - cron: '15 4 * * 1-5'
+    - cron: '30 4 * * 1-5'
+    - cron: '45 4 * * 1-5'
+    - cron: '0 5 * * 1-5'
+    - cron: '15 5 * * 1-5'
+    - cron: '30 5 * * 1-5'
+    - cron: '45 5 * * 1-5'
+    - cron: '0 6 * * 1-5'
+    - cron: '15 6 * * 1-5'
+    - cron: '30 6 * * 1-5'
+    - cron: '45 6 * * 1-5'
+    - cron: '0 7 * * 1-5'
+    - cron: '15 7 * * 1-5'
+    - cron: '30 7 * * 1-5'
+    - cron: '45 7 * * 1-5'
+    - cron: '0 8 * * 1-5'
+    - cron: '15 8 * * 1-5'
+    - cron: '30 8 * * 1-5'
+    - cron: '45 8 * * 1-5'
+    - cron: '0 9 * * 1-5'
+    - cron: '15 9 * * 1-5'
   workflow_dispatch:
 
 jobs:
@@ -31,8 +54,8 @@ jobs:
 
       - name: 💾 Commit & Push Only If Files Changed
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add static reports index.html || true
           if ! git diff --cached --quiet; then
             git commit -m "Auto-update plots, CSVs and reports"
