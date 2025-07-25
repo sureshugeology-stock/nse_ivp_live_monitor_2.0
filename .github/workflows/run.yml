@@ -2,7 +2,7 @@ name: Run NSE IVP Monitor Every 10 Min During Market Hours
 
 on:
   schedule:
-    - cron: '*/10 3-9 * * 1-5'  # Every 10 minutes from 08:30 to 15:30 IST (03:00 to 09:30 UTC)
+    - cron: '*/10 3-9 * * 1-5'  # Every 10 min from 08:30–14:30 IST (03:00–09:30 UTC)
   workflow_dispatch:
 
 jobs:
