@@ -2,7 +2,7 @@ name: Run NSE IVP Monitor Every 15 Min During Market Hours
 
 on:
   schedule:
-    - cron: '*/15 3-9 * * 1-5'  # Every 15 min from 08:30–15:30 IST (03:00–09:30 UTC)
+    - cron: '*/15 3-9 * * 1-5'  # 8:30–15:30 IST = 3:00–10:00 UTC
   workflow_dispatch:
 
 jobs:
@@ -39,6 +39,7 @@ jobs:
             git push
           else
             echo "✅ No changes to commit."
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
