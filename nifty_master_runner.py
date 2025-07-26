@@ -25,7 +25,7 @@ from telegram import Bot
 # -----------------------------------------
 # ✅ CONFIGURATION
 # -----------------------------------------
-DEBUG_MODE = True  # Set to True for after-hours testing
+DEBUG_MODE = False  # Set to True for after-hours testing
 STATIC_DIR = "static"
 CSV_FILENAME = os.path.join(STATIC_DIR, "atm_straddle_combined.csv")
 PDF_FOLDER = os.path.join(STATIC_DIR, "reports")
@@ -120,26 +120,39 @@ def get_nse_cookies():
             driver.quit()
         return None
 # -----------------------------------------
-# ✅ SCRAPE INDIA VIX
+# ✅ SCRAPE INDIA VIX (Stable GitHub Actions version)
 # -----------------------------------------
 def scrape_india_vix():
+    import traceback
+
     print("🔍 Scraping India VIX via Selenium...")
+
     try:
         options = Options()
         options.add_argument("--headless")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--disable-blink-features=AutomationControlled")
+        options.add_argument("--disable-gpu")
+        options.add_argument("--window-size=1920x1080")
         options.add_argument(f"user-agent={random.choice(USER_AGENTS)}")
 
         driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
         driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+
+        # Step 1: Load NSE homepage to set cookies
+        driver.get("https://www.nseindia.com")
+        time.sleep(2)
+
+        # Step 2: Load LIVE_INDICES_URL
         driver.get(LIVE_INDICES_URL)
         WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.TAG_NAME, "table")))
         time.sleep(random.uniform(2, 4))
+
         soup = BeautifulSoup(driver.page_source, 'html.parser')
         driver.quit()
 
+        # Step 3: Parse India VIX
         for row in soup.find_all('tr'):
             cols = row.find_all('td')
             if any("INDIA VIX" in c.text for c in cols):
@@ -147,12 +160,20 @@ def scrape_india_vix():
                 if vix_value:
                     print(f"✅ India VIX scraped: {vix_value}")
                     return vix_value
-        print("❗️ India VIX not found")
+
+        # Debug output if not found
+        print("❗️ India VIX not found in table rows.")
+        print("🔎 Dumping partial page content (first 500 chars):")
+        print(driver.page_source[:500])
         return None
+
     except Exception as e:
-        print(f"❗️ India VIX scrape error: {e}")
+        print(f"❗️ India VIX scrape error:\n{traceback.format_exc()}")
         if 'driver' in locals():
-            driver.quit()
+            try:
+                driver.quit()
+            except:
+                pass
         return None
 
 # -----------------------------------------
