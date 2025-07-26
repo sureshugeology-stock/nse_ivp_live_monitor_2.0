@@ -2,12 +2,15 @@ name: Run NSE IVP Monitor Every 15 Min During Market Hours
 
 on:
   schedule:
-    - cron: '*/15 3-9 * * 1-5'  # 8:30–15:30 IST = 3:00–10:00 UTC
+    - cron: '45 3 * * 1-5'            # 09:15 IST (03:45 UTC)
+    - cron: '0,15,30,45 4-9 * * 1-5'  # 09:30–15:15 IST (04:00–09:45 UTC) every 15 min
+    - cron: '0 10 * * 1-5'            # 15:30 IST (10:00 UTC)
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     env:
       TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -20,6 +23,33 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+
+      - name: 🔍 Dynamic NSE Market Holiday Check
+        run: |
+          import sys
+          import requests
+          from datetime import datetime
+
+          headers = {
+              'User-Agent': 'Mozilla/5.0 (compatible; GitHubActions/1.0; +https://github.com/your/repository)'
+          }
+          url = "https://www.nseindia.com/api/holiday-master?type=trading"
+
+          try:
+              response = requests.get(url, headers=headers, timeout=10)
+              response.raise_for_status()
+              data = response.json()
+              holidays = [h['tradingDate'] for h in data['FO']]
+              today = datetime.utcnow().strftime("%Y-%m-%d")
+              if today in holidays:
+                  print(f"Today {today} is a market holiday. Exiting workflow.")
+                  sys.exit(0)
+              else:
+                  print(f"Today {today} is a trading day. Continuing workflow.")
+          except Exception as e:
+              print(f"Could not check market holiday status due to: {e}")
+              sys.exit(0)  # Or remove to proceed on API failure
+        shell: python
 
       - name: 📦 Install Dependencies
         run: |
