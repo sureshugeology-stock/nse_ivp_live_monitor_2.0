@@ -24,6 +24,11 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: 📦 Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
       - name: 🔍 Dynamic NSE Market Holiday Check
         run: |
           import sys
@@ -39,7 +44,7 @@ jobs:
               response = requests.get(url, headers=headers, timeout=10)
               response.raise_for_status()
               data = response.json()
-              holidays = [h['tradingDate'] for h in data['FO']]
+              holidays = [h['tradingDate'] for h in data['FO']]  # Change to 'CM' for equity segment if needed
               today = datetime.utcnow().strftime("%Y-%m-%d")
               if today in holidays:
                   print(f"Today {today} is a market holiday. Exiting workflow.")
@@ -48,13 +53,8 @@ jobs:
                   print(f"Today {today} is a trading day. Continuing workflow.")
           except Exception as e:
               print(f"Could not check market holiday status due to: {e}")
-              sys.exit(0)  # Or remove to proceed on API failure
+              sys.exit(0)  # Change or remove this line to proceed even if API fails
         shell: python
-
-      - name: 📦 Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
 
       - name: 🚀 Run NSE Master Script
         run: python nifty_master_runner.py
